@@ -12,6 +12,7 @@ export function Header() {
     { name: 'About', href: '/about' },
     { name: 'UI Components', href: '/ui-showcase' },
     { name: 'Forms', href: '/forms-showcase' },
+    { name: 'Authentication', href: '/auth' },
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Contact', href: '/contact' },
   ];

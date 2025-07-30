@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ContactPage } from './pages/ContactPage';
 import { UIShowcasePage } from './pages/UIShowcasePage';
 import { FormsShowcasePage } from './pages/FormsShowcasePage';
+import { AuthPage } from './pages/AuthPage';
 import './App.css';
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
         element={
           <MainLayout>
             <FormsShowcasePage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/auth"
+        element={
+          <MainLayout>
+            <AuthPage />
           </MainLayout>
         }
       />
