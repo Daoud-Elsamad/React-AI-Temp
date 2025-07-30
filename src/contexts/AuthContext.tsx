@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 import { useStore } from '@/store/useStore';
 import api from '@/lib/axios';
@@ -63,8 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { user, setUser, setLoading } = useStore();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check if user is authenticated
-  const isAuthenticated = !!user && !!getStoredToken();
+  // Memoize authentication status to prevent unnecessary recalculations
+  const isAuthenticated = useMemo(() => !!user && !!getStoredToken(), [user]);
 
   // Auto refresh token
   const refreshToken = useCallback(async (): Promise<boolean> => {
@@ -240,7 +241,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [logout]);
 
-  const value: AuthContextType = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated,
     isLoading,
@@ -249,7 +251,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     refreshToken,
     updateUser,
-  };
+  }), [user, isAuthenticated, isLoading, login, logout, register, refreshToken, updateUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

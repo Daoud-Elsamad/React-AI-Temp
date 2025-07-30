@@ -1,16 +1,27 @@
+import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
-import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { ContactPage } from './pages/ContactPage';
-import { UIShowcasePage } from './pages/UIShowcasePage';
-import { FormsShowcasePage } from './pages/FormsShowcasePage';
-import { AuthPage } from './pages/AuthPage';
-import { AIPage } from './pages/AIPage';
-import { FileManagementPage } from './pages/FileManagementPage';
-import { AIFileProcessingPage } from './pages/AIFileProcessingPage';
+import { Loading } from './components/ui/Loading';
+import { ErrorBoundary } from './components/error/ErrorBoundary';
+import { NotFoundPage } from './pages/ErrorPages';
 import './App.css';
+
+// Lazy load all pages for code splitting
+const HomePage = React.lazy(() => import('./pages/HomePage').then(module => ({ default: module.HomePage })));
+const AboutPage = React.lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
+const ContactPage = React.lazy(() => import('./pages/ContactPage').then(module => ({ default: module.ContactPage })));
+const UIShowcasePage = React.lazy(() => import('./pages/UIShowcasePage').then(module => ({ default: module.UIShowcasePage })));
+const FormsShowcasePage = React.lazy(() => import('./pages/FormsShowcasePage').then(module => ({ default: module.FormsShowcasePage })));
+const AuthPage = React.lazy(() => import('./pages/AuthPage').then(module => ({ default: module.AuthPage })));
+const AIPage = React.lazy(() => import('./pages/AIPage').then(module => ({ default: module.AIPage })));
+const FileManagementPage = React.lazy(() => import('./pages/FileManagementPage').then(module => ({ default: module.FileManagementPage })));
+const AIFileProcessingPage = React.lazy(() => import('./pages/AIFileProcessingPage').then(module => ({ default: module.AIFileProcessingPage })));
+const PerformancePage = React.lazy(() => import('./pages/PerformancePage').then(module => ({ default: module.PerformancePage })));
+const MonitoringDemoPage = React.lazy(() => import('./pages/MonitoringDemoPage').then(module => ({ default: module.MonitoringDemoPage })));
+
+// Reusable loading fallback component
+const PageLoading = () => <Loading variant="page" />;
 
 function App() {
   return (
@@ -20,7 +31,11 @@ function App() {
         path="/"
         element={
           <MainLayout>
-            <HomePage />
+            <ErrorBoundary level="component">
+              <Suspense fallback={<PageLoading />}>
+                <HomePage />
+              </Suspense>
+            </ErrorBoundary>
           </MainLayout>
         }
       />
@@ -28,7 +43,9 @@ function App() {
         path="/about"
         element={
           <MainLayout>
-            <AboutPage />
+            <Suspense fallback={<PageLoading />}>
+              <AboutPage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -36,7 +53,9 @@ function App() {
         path="/contact"
         element={
           <MainLayout>
-            <ContactPage />
+            <Suspense fallback={<PageLoading />}>
+              <ContactPage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -44,7 +63,9 @@ function App() {
         path="/ui-showcase"
         element={
           <MainLayout>
-            <UIShowcasePage />
+            <Suspense fallback={<PageLoading />}>
+              <UIShowcasePage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -52,7 +73,9 @@ function App() {
         path="/forms-showcase"
         element={
           <MainLayout>
-            <FormsShowcasePage />
+            <Suspense fallback={<PageLoading />}>
+              <FormsShowcasePage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -60,7 +83,11 @@ function App() {
         path="/ai"
         element={
           <MainLayout>
-            <AIPage />
+            <ErrorBoundary level="component">
+              <Suspense fallback={<PageLoading />}>
+                <AIPage />
+              </Suspense>
+            </ErrorBoundary>
           </MainLayout>
         }
       />
@@ -68,7 +95,9 @@ function App() {
         path="/auth"
         element={
           <MainLayout>
-            <AuthPage />
+            <Suspense fallback={<PageLoading />}>
+              <AuthPage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -76,7 +105,9 @@ function App() {
         path="/files"
         element={
           <MainLayout>
-            <FileManagementPage />
+            <Suspense fallback={<PageLoading />}>
+              <FileManagementPage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -84,7 +115,19 @@ function App() {
         path="/ai-files"
         element={
           <MainLayout>
-            <AIFileProcessingPage />
+            <Suspense fallback={<PageLoading />}>
+              <AIFileProcessingPage />
+            </Suspense>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/performance"
+        element={
+          <MainLayout>
+            <Suspense fallback={<PageLoading />}>
+              <PerformancePage />
+            </Suspense>
           </MainLayout>
         }
       />
@@ -94,7 +137,11 @@ function App() {
         path="/dashboard"
         element={
           <MainLayout showSidebar>
-            <DashboardPage />
+            <ErrorBoundary level="component">
+              <Suspense fallback={<PageLoading />}>
+                <DashboardPage />
+              </Suspense>
+            </ErrorBoundary>
           </MainLayout>
         }
       />
@@ -102,14 +149,16 @@ function App() {
         path="/analytics"
         element={
           <MainLayout showSidebar>
-            <div className="p-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Analytics
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Analytics page coming soon...
-              </p>
-            </div>
+            <Suspense fallback={<PageLoading />}>
+              <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Analytics
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                  Analytics page coming soon...
+                </p>
+              </div>
+            </Suspense>
           </MainLayout>
         }
       />
@@ -117,14 +166,16 @@ function App() {
         path="/settings"
         element={
           <MainLayout showSidebar>
-            <div className="p-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Settings
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Settings page coming soon...
-              </p>
-            </div>
+            <Suspense fallback={<PageLoading />}>
+              <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Settings
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                  Settings page coming soon...
+                </p>
+              </div>
+            </Suspense>
           </MainLayout>
         }
       />
@@ -132,14 +183,28 @@ function App() {
         path="/help"
         element={
           <MainLayout showSidebar>
-            <div className="p-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Help
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Help center coming soon...
-              </p>
-            </div>
+            <Suspense fallback={<PageLoading />}>
+              <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Help
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                  Help center coming soon...
+                </p>
+              </div>
+            </Suspense>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/monitoring-demo"
+        element={
+          <MainLayout>
+            <ErrorBoundary level="component">
+              <Suspense fallback={<PageLoading />}>
+                <MonitoringDemoPage />
+              </Suspense>
+            </ErrorBoundary>
           </MainLayout>
         }
       />
@@ -147,29 +212,7 @@ function App() {
       {/* 404 fallback */}
       <Route
         path="*"
-        element={
-          <MainLayout>
-            <div className="min-h-[60vh] flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-6xl font-bold text-gray-300 dark:text-gray-600 mb-4">
-                  404
-                </h1>
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Page Not Found
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-8">
-                  The page you're looking for doesn't exist.
-                </p>
-                <a
-                  href="/"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  Go Home
-                </a>
-              </div>
-            </div>
-          </MainLayout>
-        }
+        element={<NotFoundPage />}
       />
     </Routes>
   );

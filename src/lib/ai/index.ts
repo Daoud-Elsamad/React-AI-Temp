@@ -1,18 +1,30 @@
-// Re-export all types and services
+// Export all AI services and types
 export * from './types';
-export * from './aiService';
-export * from './streamingService';
-export * from './baseService';
-export * from './errors';
 export * from './config';
-export * from './cache';
-export * from './rateLimiter';
-export * from './simpleCache';
-export * from './conversationStorage';
-
-// Provider exports
+export * from './aiService';
+export * from './baseService';
 export * from './providers/openai';
 export * from './providers/huggingface';
+export * from './streamingService';
+export * from './fileProcessingService';
+export * from './conversationStorage';
+export * from './cache';
+export * from './simpleCache';
+export * from './rateLimiter';
+export * from './errors';
 
-// Default service instance
-export { aiService } from './aiService'; 
+// Export new advanced AI services
+export * from './promptTemplateService';
+export * from './contextService';
+export * from './modelService';
+export * from './promptEngineeringService';
+export * from './exportImportService';
+
+// Export singleton instances
+export { aiService } from './aiService';
+export { conversationStorage } from './conversationStorage';
+export { promptTemplateService } from './promptTemplateService';
+export { contextService } from './contextService';
+export { modelService } from './modelService';
+export { promptEngineeringService } from './promptEngineeringService';
+export { exportImportService } from './exportImportService'; 

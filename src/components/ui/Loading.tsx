@@ -174,3 +174,55 @@ export const SkeletonTable: React.FC<{
     </div>
   );
 };
+
+interface LoadingProps {
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'spinner' | 'skeleton' | 'page';
+  text?: string;
+  fullScreen?: boolean;
+}
+
+export const Loading: React.FC<LoadingProps> = ({ 
+  size = 'md', 
+  variant = 'spinner', 
+  text,
+  fullScreen = false 
+}) => {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-8 h-8',
+    lg: 'w-12 h-12'
+  };
+
+  const containerClasses = fullScreen 
+    ? 'fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-50'
+    : 'flex items-center justify-center p-4';
+
+  if (variant === 'page') {
+    return (
+      <div className={containerClasses}>
+        <div className="text-center">
+          <div className={`animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 ${sizeClasses.lg} mx-auto mb-4`}></div>
+          <p className="text-gray-600 dark:text-gray-400">{text || 'Loading page...'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === 'skeleton') {
+    return (
+      <div className="animate-pulse space-y-4 p-4">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={containerClasses}>
+      <div className={`animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 ${sizeClasses[size]}`}></div>
+      {text && <span className="ml-2 text-gray-600 dark:text-gray-400">{text}</span>}
+    </div>
+  );
+};

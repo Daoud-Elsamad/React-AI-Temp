@@ -235,4 +235,238 @@ export interface ProviderConfig {
   baseURL?: string;
   timeout?: number;
   defaultModel?: string;
+}
+
+// Prompt Template System Types
+export interface PromptTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: 'general' | 'code' | 'creative' | 'business' | 'analysis' | 'custom';
+  template: string;
+  variables: PromptVariable[];
+  tags: string[];
+  createdAt: number;
+  updatedAt: number;
+  usageCount: number;
+  rating?: number;
+  isBuiltIn: boolean;
+  author?: string;
+}
+
+export interface PromptVariable {
+  name: string;
+  type: 'text' | 'number' | 'select' | 'textarea' | 'boolean';
+  description: string;
+  required: boolean;
+  defaultValue?: any;
+  options?: string[]; // For select type
+  placeholder?: string;
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    message?: string;
+  };
+}
+
+export interface PromptTemplateCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  templates: PromptTemplate[];
+}
+
+export interface PromptExecution {
+  templateId: string;
+  variables: Record<string, any>;
+  generatedPrompt: string;
+  response?: string;
+  timestamp: number;
+  model?: string;
+  provider?: AIProviderType;
+  metadata?: {
+    tokens?: number;
+    cost?: number;
+    duration?: number;
+  };
+}
+
+// Model Management Types
+export interface AIModel {
+  id: string;
+  name: string;
+  provider: AIProviderType;
+  capabilities: ProviderCapabilities;
+  contextLength: number;
+  costPer1kTokens?: {
+    input: number;
+    output: number;
+  };
+  description?: string;
+  version?: string;
+  isAvailable: boolean;
+  performance?: {
+    speed: 'fast' | 'medium' | 'slow';
+    quality: 'basic' | 'good' | 'excellent';
+    reasoning: 'basic' | 'good' | 'excellent';
+  };
+}
+
+export interface ModelComparison {
+  models: AIModel[];
+  testPrompt: string;
+  results: ModelComparisonResult[];
+  createdAt: number;
+}
+
+export interface ModelComparisonResult {
+  modelId: string;
+  response: string;
+  metrics: {
+    responseTime: number;
+    tokenCount: number;
+    cost: number;
+    quality?: number; // 1-10 rating
+  };
+}
+
+// Context Management Types
+export interface ConversationContext {
+  id: string;
+  conversationId: string;
+  windowSize: number; // Number of messages to keep in context
+  compressionStrategy: 'none' | 'summarize' | 'truncate' | 'selective';
+  priority: ContextPriority[];
+  metadata: {
+    totalTokens: number;
+    contextTokens: number;
+    compressionRatio: number;
+  };
+}
+
+export interface ContextPriority {
+  type: 'system' | 'user' | 'assistant' | 'function';
+  weight: number; // 0-1, higher weight = more likely to keep
+  rules: ContextRule[];
+}
+
+export interface ContextRule {
+  condition: 'message_role' | 'message_age' | 'message_length' | 'keyword_presence' | 'importance_score';
+  operator: 'equals' | 'contains' | 'greater_than' | 'less_than' | 'in_range';
+  value: any;
+  action: 'keep' | 'summarize' | 'remove';
+}
+
+export interface ContextSummary {
+  originalMessageCount: number;
+  summarizedContent: string;
+  retainedMessages: ChatMessage[];
+  compressionRatio: number;
+  generatedAt: number;
+}
+
+// Prompt Engineering Types
+export interface PromptTest {
+  id: string;
+  name: string;
+  prompt: string;
+  testCases: PromptTestCase[];
+  models: string[];
+  createdAt: number;
+  lastRunAt?: number;
+  results?: PromptTestResult[];
+}
+
+export interface PromptTestCase {
+  id: string;
+  name: string;
+  input: string;
+  expectedOutput?: string;
+  evaluationCriteria: EvaluationCriteria[];
+}
+
+export interface EvaluationCriteria {
+  type: 'exact_match' | 'contains' | 'similarity' | 'length' | 'custom';
+  description: string;
+  weight: number; // 0-1
+  threshold?: number;
+  customFunction?: (response: string, expected: string) => number;
+}
+
+export interface PromptTestResult {
+  testId: string;
+  modelId: string;
+  testCaseResults: TestCaseResult[];
+  overallScore: number;
+  executedAt: number;
+  metadata: {
+    totalCost: number;
+    totalTime: number;
+    averageTokens: number;
+  };
+}
+
+export interface TestCaseResult {
+  testCaseId: string;
+  response: string;
+  score: number;
+  passed: boolean;
+  criteriaResults: CriteriaResult[];
+  metadata: {
+    responseTime: number;
+    tokens: number;
+    cost: number;
+  };
+}
+
+export interface CriteriaResult {
+  criteriaType: string;
+  score: number;
+  passed: boolean;
+  message?: string;
+}
+
+// Export/Import Types
+export interface ConversationExport {
+  version: string;
+  exportedAt: number;
+  format: 'json' | 'markdown' | 'txt' | 'csv' | 'pdf';
+  conversation: Conversation;
+  messages: ChatMessage[];
+  metadata: {
+    totalTokens?: number;
+    totalCost?: number;
+    averageResponseTime?: number;
+    providerDistribution: Record<AIProviderType, number>;
+  };
+}
+
+export interface ExportOptions {
+  format: 'json' | 'markdown' | 'txt' | 'csv' | 'pdf';
+  includeMetadata: boolean;
+  includeTimestamps: boolean;
+  includeSystemMessages: boolean;
+  dateRange?: {
+    start: number;
+    end: number;
+  };
+  messageFilter?: {
+    roles: ('system' | 'user' | 'assistant')[];
+    minLength?: number;
+    maxLength?: number;
+  };
+}
+
+export interface ImportResult {
+  success: boolean;
+  conversationId?: string;
+  errors: string[];
+  warnings: string[];
+  metadata: {
+    totalMessages: number;
+    skippedMessages: number;
+    estimatedTokens: number;
+  };
 } 

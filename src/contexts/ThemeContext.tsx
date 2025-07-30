@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '@/store/useStore';
 
 type Theme = 'light' | 'dark';
@@ -14,9 +14,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useStore();
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+  }, [theme, setTheme]);
 
   // Apply theme to document
   useEffect(() => {
@@ -25,11 +25,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.add(theme);
   }, [theme]);
 
-  const value = {
+  const value = useMemo(() => ({
     theme,
     setTheme,
     toggleTheme,
-  };
+  }), [theme, setTheme, toggleTheme]);
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
