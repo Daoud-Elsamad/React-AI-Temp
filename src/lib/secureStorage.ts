@@ -286,7 +286,7 @@ export class SecureAPIKeyManager {
         return /^sk-ant-[a-zA-Z0-9-_]{95,}$/.test(apiKey);
       default:
         // Generic validation - alphanumeric with common special chars
-        return /^[a-zA-Z0-9\-_\.]+$/.test(apiKey);
+        return /^[a-zA-Z0-9\-_.]+$/.test(apiKey);
     }
   }
 

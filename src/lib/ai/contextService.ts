@@ -186,9 +186,10 @@ export class ContextService {
         }
         return false;
 
-      case 'importance_score':
+      case 'importance_score': {
         const score = this.calculateImportanceScore(message, messageIndex, totalMessages);
         return this.compareValues(score, rule.operator, rule.value);
+      }
 
       default:
         return false;
@@ -278,7 +279,7 @@ export class ContextService {
     // Apply context optimization strategy
     switch (config.compressionStrategy) {
       case 'truncate':
-        return this.optimizeByTruncation(messages, maxTokens, config);
+        return this.optimizeByTruncation(messages, maxTokens);
 
       case 'selective':
         return this.optimizeBySelection(messages, maxTokens, config);
@@ -319,8 +320,7 @@ export class ContextService {
 
   private async optimizeByTruncation(
     messages: ChatMessage[],
-    maxTokens: number,
-    _config: ConversationContext
+    maxTokens: number
   ): Promise<{
     optimizedMessages: ChatMessage[];
     summary: ContextSummary;
@@ -480,7 +480,7 @@ export class ContextService {
         };
       } catch (error) {
         console.error('Failed to generate summary, falling back to truncation:', error);
-        return this.optimizeByTruncation(messages, maxTokens, config);
+        return this.optimizeByTruncation(messages, maxTokens);
       }
     }
 

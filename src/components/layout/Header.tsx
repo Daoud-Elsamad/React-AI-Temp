@@ -8,15 +8,20 @@ export function Header() {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'AI Integration', href: '/ai' },
-    { name: 'AI File Processing', href: '/ai-files' },
+    { name: 'Home', href: '/', category: 'main' },
+    { name: 'About', href: '/about', category: 'main' },
+    { name: 'Dashboard', href: '/dashboard', category: 'main' },
+    { name: 'AI Chat', href: '/ai', category: 'ai' },
+    { name: 'AI Files', href: '/ai-files', category: 'ai' },
+    { name: 'Components', href: '/ui-showcase', category: 'dev' },
+    { name: 'Forms', href: '/forms-showcase', category: 'dev' },
+    { name: 'Auth', href: '/auth', category: 'dev' },
+  ];
+
+  const moreItems = [
     { name: 'File Management', href: '/files' },
-    { name: 'UI Components', href: '/ui-showcase' },
-    { name: 'Forms', href: '/forms-showcase' },
-    { name: 'Authentication', href: '/auth' },
-    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Performance', href: '/performance' },
+    { name: 'Monitoring', href: '/monitoring-demo' },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -41,7 +46,7 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden lg:flex space-x-6">
             {navigation.map(item => (
               <Link
                 key={item.name}
@@ -55,6 +60,36 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* More dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center"
+              >
+                More
+                <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="py-1">
+                    {moreItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Theme Toggle & Mobile Menu Button */}
@@ -99,7 +134,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="lg:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -137,7 +172,7 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="lg:hidden py-4 border-t border-gray-200 dark:border-gray-700">
             <nav className="flex flex-col space-y-2">
               {navigation.map(item => (
                 <Link
@@ -153,6 +188,27 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* More items in mobile */}
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700 mt-4">
+                <p className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  More
+                </p>
+                {moreItems.map(item => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActiveRoute(item.href)
+                        ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
             </nav>
           </div>
         )}

@@ -615,7 +615,7 @@ export class PromptTemplateService {
       if (value !== undefined && value !== null && value !== '') {
         // Validate by type
         switch (variable.type) {
-          case 'number':
+          case 'number': {
             const numValue = Number(value);
             if (isNaN(numValue)) {
               errors.push(`${variable.name} must be a number`);
@@ -625,6 +625,7 @@ export class PromptTemplateService {
               errors.push(`${variable.name} must be at most ${variable.validation.max}`);
             }
             break;
+          }
 
           case 'select':
             if (variable.options && !variable.options.includes(value)) {
@@ -633,7 +634,7 @@ export class PromptTemplateService {
             break;
 
           case 'text':
-          case 'textarea':
+          case 'textarea': {
             const strValue = String(value);
             if (variable.validation?.min !== undefined && strValue.length < variable.validation.min) {
               errors.push(`${variable.name} must be at least ${variable.validation.min} characters`);
@@ -646,6 +647,7 @@ export class PromptTemplateService {
               }
             }
             break;
+          }
         }
       }
     });

@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { componentVariants } from '@/lib/design-system';
 
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -9,6 +10,7 @@ export interface InputProps
   helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  variant?: 'default' | 'error' | 'success';
 }
 
 export interface TextAreaProps
@@ -18,13 +20,8 @@ export interface TextAreaProps
   label?: string;
   helperText?: string;
   resize?: 'none' | 'vertical' | 'horizontal' | 'both';
+  variant?: 'default' | 'error' | 'success';
 }
-
-const inputSizes = {
-  sm: 'h-8 px-3 text-sm',
-  md: 'h-10 px-4 text-sm',
-  lg: 'h-12 px-4 text-base',
-};
 
 const textareaSizes = {
   sm: 'p-2 text-sm min-h-[80px]',
@@ -42,6 +39,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       helperText,
       leftIcon,
       rightIcon,
+      variant,
       id,
       ...props
     },
@@ -52,9 +50,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const baseStyles =
       'w-full rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed';
 
-    const errorStyles = error
-      ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-      : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:focus:border-blue-400';
+    // Determine variant based on error prop or explicit variant
+    const inputVariant = error ? 'error' : (variant || 'default');
+    const variantStyles = componentVariants.input.variant[inputVariant];
 
     return (
       <div className="space-y-1">
@@ -76,8 +74,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             className={cn(
               baseStyles,
-              inputSizes[size],
-              errorStyles,
+              componentVariants.input.size[size],
+              variantStyles,
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               'dark:bg-gray-800 dark:text-gray-100',
@@ -114,6 +112,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
       label,
       helperText,
       resize = 'vertical',
+      variant,
       id,
       ...props
     },
@@ -125,9 +124,9 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const baseStyles =
       'w-full rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed';
 
-    const errorStyles = error
-      ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-      : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:focus:border-blue-400';
+    // Determine variant based on error prop or explicit variant
+    const textareaVariant = error ? 'error' : (variant || 'default');
+    const variantStyles = componentVariants.input.variant[textareaVariant];
 
     const resizeStyles = {
       none: 'resize-none',
@@ -151,7 +150,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           className={cn(
             baseStyles,
             textareaSizes[size],
-            errorStyles,
+            variantStyles,
             resizeStyles[resize],
             'dark:bg-gray-800 dark:text-gray-100',
             className

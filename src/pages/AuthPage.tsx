@@ -191,7 +191,7 @@ export function AuthPage() {
               <Button onClick={() => setMode('login')} variant="outline">
                 Back to Login Demo
               </Button>
-              <Button onClick={logout} variant="destructive">
+              <Button onClick={logout} variant="error">
                 Logout
               </Button>
             </div>

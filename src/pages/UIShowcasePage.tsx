@@ -5,379 +5,418 @@ import {
   Input,
   TextArea,
   Modal,
-  Dialog,
-  Spinner,
-  Skeleton,
-  LoadingSpinner,
-  SkeletonCard,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  Badge,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Select,
+  Icon,
+  Loading,
   ToastProvider,
   useToastHelpers,
-  Icon,
-  IconButton,
 } from '@/components/ui';
 
 const ToastDemo: React.FC = () => {
   const toast = useToastHelpers();
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Toast Notifications</h3>
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="primary"
-          onClick={() =>
-            toast.success('Success!', 'Operation completed successfully')
-          }
-        >
-          Success Toast
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => toast.error('Error!', 'Something went wrong')}
-        >
-          Error Toast
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() => toast.warning('Warning!', 'Please check your input')}
-        >
-          Warning Toast
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => toast.info('Info', 'Here is some information')}
-        >
-          Info Toast
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Toast Notifications</CardTitle>
+        <CardDescription>Interactive toast notifications with different variants</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => toast.success('Success!', 'Operation completed successfully')}>
+            Success Toast
+          </Button>
+          <Button 
+            variant="error" 
+            onClick={() => toast.error('Error!', 'Something went wrong')}
+          >
+            Error Toast
+          </Button>
+          <Button 
+            variant="warning" 
+            onClick={() => toast.warning('Warning!', 'Please check your input')}
+          >
+            Warning Toast
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => toast.info('Info', 'Here is some information')}
+          >
+            Info Toast
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const ButtonShowcase: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLoadingDemo = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 2000);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Buttons</CardTitle>
+        <CardDescription>Button components with various variants and sizes</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Variants */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Variants</h4>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="primary">Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="outline">Outline</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="success">Success</Button>
+            <Button variant="warning">Warning</Button>
+            <Button variant="error">Error</Button>
+            <Button variant="link">Link</Button>
+          </div>
+        </div>
+
+        {/* Sizes */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Sizes</h4>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="xs">Extra Small</Button>
+            <Button size="sm">Small</Button>
+            <Button size="md">Medium</Button>
+            <Button size="lg">Large</Button>
+            <Button size="xl">Extra Large</Button>
+          </div>
+        </div>
+
+        {/* States */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">States</h4>
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={handleLoadingDemo} isLoading={isLoading}>
+              {isLoading ? 'Loading...' : 'Click to Load'}
+            </Button>
+            <Button disabled>Disabled</Button>
+            <Button leftIcon={<Icon name="plus" />}>With Left Icon</Button>
+            <Button rightIcon={<Icon name="chevronRight" />}>With Right Icon</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const FormShowcase: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+    country: '',
+  });
+
+  const countries = [
+    { value: 'us', label: 'United States' },
+    { value: 'ca', label: 'Canada' },
+    { value: 'uk', label: 'United Kingdom' },
+    { value: 'de', label: 'Germany' },
+    { value: 'fr', label: 'France' },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Form Components</CardTitle>
+        <CardDescription>Input fields, text areas, and select dropdowns</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <Input
+              label="Name"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+            <Input
+              label="Email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              leftIcon={<Icon name="user" />}
+            />
+            <Input
+              label="With Error"
+              placeholder="This field has an error"
+              error="This field is required"
+              variant="error"
+            />
+            <Input
+              label="Success State"
+              placeholder="This field is valid"
+              variant="success"
+            />
+          </div>
+          <div className="space-y-4">
+            <Select
+              label="Country"
+              options={countries}
+              value={formData.country}
+              onChange={(value) => setFormData({ ...formData, country: value })}
+              placeholder="Select a country"
+            />
+            <TextArea
+              label="Message"
+              placeholder="Enter your message"
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              helperText="Maximum 500 characters"
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const BadgeShowcase: React.FC = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Badges</CardTitle>
+        <CardDescription>Status indicators and labels</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Variants</h4>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="default">Default</Badge>
+            <Badge variant="primary">Primary</Badge>
+            <Badge variant="success">Success</Badge>
+            <Badge variant="warning">Warning</Badge>
+            <Badge variant="error">Error</Badge>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Sizes</h4>
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge size="sm">Small</Badge>
+            <Badge size="md">Medium</Badge>
+            <Badge size="lg">Large</Badge>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const CardShowcase: React.FC = () => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Card variant="default">
+        <CardHeader>
+          <CardTitle>Default Card</CardTitle>
+          <CardDescription>This is a default card variant</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Default card content with standard styling and shadow.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button size="sm">Action</Button>
+        </CardFooter>
+      </Card>
+
+      <Card variant="elevated">
+        <CardHeader>
+          <CardTitle>Elevated Card</CardTitle>
+          <CardDescription>This is an elevated card variant</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Elevated card with enhanced shadow for prominence.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button size="sm" variant="outline">Action</Button>
+        </CardFooter>
+      </Card>
+
+      <Card variant="interactive">
+        <CardHeader>
+          <CardTitle>Interactive Card</CardTitle>
+          <CardDescription>This is an interactive card variant</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Interactive card with hover effects and cursor pointer.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button size="sm" variant="success">Action</Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
 
-const UIShowcaseContent: React.FC = () => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [textareaValue, setTextareaValue] = useState('');
-
+const TabsShowcase: React.FC = () => {
   return (
-    <PageWrapper
-      title="UI Component Library"
-      subtitle="Comprehensive showcase of all available UI components"
-    >
-      <div className="space-y-12">
-        {/* Buttons Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Buttons
-          </h2>
-
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Button Variants</h3>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="outline">Outline</Button>
-                <Button variant="ghost">Ghost</Button>
-                <Button variant="destructive">Destructive</Button>
-                <Button variant="link">Link</Button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Button Sizes</h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button size="sm">Small</Button>
-                <Button size="md">Medium</Button>
-                <Button size="lg">Large</Button>
-                <Button size="xl">Extra Large</Button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Button States</h3>
-              <div className="flex flex-wrap gap-3">
-                <Button isLoading>Loading</Button>
-                <Button disabled>Disabled</Button>
-                <Button leftIcon={<Icon name="plus" size="sm" />}>
-                  With Left Icon
-                </Button>
-                <Button rightIcon={<Icon name="chevronRight" size="sm" />}>
-                  With Right Icon
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Inputs Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Form Inputs
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <Input
-                label="Default Input"
-                placeholder="Enter text here..."
-                value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
-              />
-
-              <Input
-                label="Input with Icon"
-                placeholder="Search..."
-                leftIcon={<Icon name="search" size="sm" />}
-              />
-
-              <Input
-                label="Input with Error"
-                placeholder="Invalid input"
-                error="This field is required"
-              />
-
-              <Input
-                label="Input with Helper Text"
-                placeholder="Helper text example"
-                helperText="This is some helpful information"
-              />
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Input Sizes</label>
-                <Input size="sm" placeholder="Small input" />
-                <Input size="md" placeholder="Medium input" />
-                <Input size="lg" placeholder="Large input" />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <TextArea
-                label="Text Area"
-                placeholder="Enter your message..."
-                value={textareaValue}
-                onChange={e => setTextareaValue(e.target.value)}
-              />
-
-              <TextArea
-                label="Text Area with Error"
-                placeholder="This has an error"
-                error="Message is too short"
-              />
-
-              <TextArea
-                label="Non-resizable Text Area"
-                placeholder="Cannot be resized"
-                resize="none"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Icons Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Icons
-          </h2>
-
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Icon Sizes</h3>
-              <div className="flex items-center gap-4">
-                <Icon name="star" size="xs" />
-                <Icon name="star" size="sm" />
-                <Icon name="star" size="md" />
-                <Icon name="star" size="lg" />
-                <Icon name="star" size="xl" />
-                <Icon name="star" size="2xl" />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Icon Colors</h3>
-              <div className="flex items-center gap-4">
-                <Icon name="heart" color="current" />
-                <Icon name="heart" color="primary" />
-                <Icon name="heart" color="success" />
-                <Icon name="heart" color="error" />
-                <Icon name="heart" color="warning" />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Common Icons</h3>
-              <div className="grid grid-cols-8 gap-4">
-                {[
-                  'check',
-                  'x',
-                  'plus',
-                  'minus',
-                  'edit',
-                  'delete',
-                  'search',
-                  'filter',
-                  'home',
-                  'menu',
-                  'user',
-                  'users',
-                  'settings',
-                  'info',
-                  'warning',
-                  'error',
-                ].map(iconName => (
-                  <div
-                    key={iconName}
-                    className="flex flex-col items-center space-y-1"
-                  >
-                    <Icon name={iconName as any} size="lg" />
-                    <span className="text-xs">{iconName}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Icon Buttons</h3>
-              <div className="flex gap-3">
-                <IconButton
-                  icon="edit"
-                  variant="ghost"
-                  onClick={() => {}}
-                  aria-label="Edit"
-                />
-                <IconButton
-                  icon="delete"
-                  variant="outline"
-                  onClick={() => {}}
-                  aria-label="Delete"
-                />
-                <IconButton
-                  icon="settings"
-                  variant="solid"
-                  onClick={() => {}}
-                  aria-label="Settings"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Loading Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Loading Components
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Spinners</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-4">
-                  <Spinner size="xs" />
-                  <Spinner size="sm" />
-                  <Spinner size="md" />
-                  <Spinner size="lg" />
-                  <Spinner size="xl" />
-                </div>
-                <LoadingSpinner text="Loading data..." />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Skeletons</h3>
-              <div className="space-y-3">
-                <Skeleton height="1rem" />
-                <Skeleton height="1rem" width="80%" />
-                <Skeleton height="1rem" width="60%" />
-                <div className="flex items-center space-x-3">
-                  <Skeleton circle width={40} height={40} />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton height="1rem" />
-                    <Skeleton height="0.875rem" width="70%" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Skeleton Components</h3>
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <SkeletonCard />
-            </div>
-          </div>
-        </section>
-
-        {/* Modals Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Modals & Dialogs
-          </h2>
-
-          <div className="flex gap-4">
-            <Button onClick={() => setModalOpen(true)}>Open Modal</Button>
-            <Button onClick={() => setDialogOpen(true)} variant="destructive">
-              Open Dialog
-            </Button>
-          </div>
-
-          <Modal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            title="Example Modal"
-            description="This is a demonstration of the modal component"
-            size="md"
-          >
-            <div className="space-y-4">
-              <p className="text-gray-600 dark:text-gray-400">
-                This is the content of the modal. You can put any React
-                components here.
-              </p>
-              <Input placeholder="Example input in modal" />
-              <div className="flex justify-end space-x-3">
-                <Button variant="outline" onClick={() => setModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={() => setModalOpen(false)}>Save</Button>
-              </div>
-            </div>
-          </Modal>
-
-          <Dialog
-            isOpen={dialogOpen}
-            onClose={() => setDialogOpen(false)}
-            title="Confirm Action"
-            description="Are you sure you want to perform this action? This cannot be undone."
-            variant="destructive"
-            onConfirm={() => console.log('Confirmed!')}
-            onCancel={() => console.log('Cancelled!')}
-            confirmText="Delete"
-            cancelText="Cancel"
-          >
+    <Card>
+      <CardHeader>
+        <CardTitle>Tabs</CardTitle>
+        <CardDescription>Tabbed interface components</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-4">
+            <h4 className="text-lg font-medium">Overview</h4>
             <p className="text-gray-600 dark:text-gray-400">
-              This is a destructive action that will permanently delete the
-              selected items.
+              This is the overview tab content. Here you can see general information and statistics.
             </p>
-          </Dialog>
-        </section>
-
-        {/* Toast Section */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Toast Notifications
-          </h2>
-          <ToastDemo />
-        </section>
-      </div>
-    </PageWrapper>
+          </TabsContent>
+          <TabsContent value="analytics" className="space-y-4">
+            <h4 className="text-lg font-medium">Analytics</h4>
+            <p className="text-gray-600 dark:text-gray-400">
+              Analytics tab showing detailed metrics and performance data.
+            </p>
+          </TabsContent>
+          <TabsContent value="reports" className="space-y-4">
+            <h4 className="text-lg font-medium">Reports</h4>
+            <p className="text-gray-600 dark:text-gray-400">
+              Reports section with downloadable documents and summaries.
+            </p>
+          </TabsContent>
+          <TabsContent value="notifications" className="space-y-4">
+            <h4 className="text-lg font-medium">Notifications</h4>
+            <p className="text-gray-600 dark:text-gray-400">
+              Notification settings and preferences management.
+            </p>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
-export const UIShowcasePage: React.FC = () => {
+const LoadingShowcase: React.FC = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Loading States</CardTitle>
+        <CardDescription>Different loading indicators and states</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Loading Variants</h4>
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="text-center">
+              <Loading variant="spinner" />
+              <p className="text-xs text-gray-500 mt-2">Spinner</p>
+            </div>
+            <div className="text-center">
+              <Loading variant="skeleton" />
+              <p className="text-xs text-gray-500 mt-2">Skeleton</p>
+            </div>
+            <div className="text-center">
+              <Loading variant="page" />
+              <p className="text-xs text-gray-500 mt-2">Page</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export function UIShowcasePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <ToastProvider>
-      <UIShowcaseContent />
+      <PageWrapper
+        title="UI Components Showcase"
+        subtitle="Comprehensive showcase of all available UI components"
+      >
+        <div className="space-y-8">
+          {/* Buttons */}
+          <ButtonShowcase />
+
+          {/* Cards */}
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Cards</h3>
+            <CardShowcase />
+          </div>
+
+          {/* Form Components */}
+          <FormShowcase />
+
+          {/* Badges */}
+          <BadgeShowcase />
+
+          {/* Tabs */}
+          <TabsShowcase />
+
+          {/* Loading States */}
+          <LoadingShowcase />
+
+          {/* Toast Demo */}
+          <ToastDemo />
+
+          {/* Modal Demo */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Modal</CardTitle>
+              <CardDescription>Modal dialog component</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => setIsModalOpen(true)}>
+                Open Modal
+              </Button>
+              <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Example Modal"
+              >
+                <div className="space-y-4">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    This is an example modal dialog. You can place any content here.
+                  </p>
+                  <div className="flex justify-end space-x-3">
+                    <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={() => setIsModalOpen(false)}>
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              </Modal>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
     </ToastProvider>
   );
-};
+}

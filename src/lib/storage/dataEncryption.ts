@@ -514,7 +514,7 @@ export const EncryptionConfigs = {
 export const dataEncryption = new DataEncryptionService();
 
 // Utility functions for common encryption tasks
-export async function encryptApiKey(apiKey: string, _provider: string): Promise<string> {
+export async function encryptApiKey(apiKey: string): Promise<string> {
   if (!dataEncryption.isInitialized()) {
     throw new Error('Data encryption not initialized');
   }

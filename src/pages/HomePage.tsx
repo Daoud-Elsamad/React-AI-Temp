@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PageWrapper } from '@/components/layout/PageWrapper';
+import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '@/components/ui';
 import { ExampleForm } from '@/components/ExampleForm';
 
 export function HomePage() {
@@ -49,18 +50,12 @@ export function HomePage() {
       <div className="space-y-16">
         {/* Hero Section */}
         <div className="text-center">
-          <div className="flex justify-center space-x-4 mb-8">
-            <Link
-              to="/dashboard"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              View Dashboard
+          <div className="flex justify-center flex-wrap gap-4 mb-8">
+            <Link to="/dashboard">
+              <Button size="lg">View Dashboard</Button>
             </Link>
-            <Link
-              to="/about"
-              className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              Learn More
+            <Link to="/about">
+              <Button variant="outline" size="lg">Learn More</Button>
             </Link>
           </div>
         </div>
@@ -70,72 +65,73 @@ export function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
             Features
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map(feature => (
-              <div
-                key={feature.name}
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-              >
-                <div className="text-3xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {feature.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {feature.description}
-                </p>
-              </div>
+              <Card key={feature.name} variant="elevated">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">{feature.icon}</div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {feature.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
 
         {/* Status Section */}
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Implementation Status
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  Project Foundation
-                </span>
+        <Card variant="elevated" padding="lg">
+          <CardHeader>
+            <CardTitle className="text-2xl">Implementation Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    Project Foundation
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    Development Tools
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    Core Dependencies
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  Development Tools
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  Core Dependencies
-                </span>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    Layout System
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    UI Component Library
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="success" size="sm" className="mr-3">✓</Badge>
+                  <span className="text-gray-900 dark:text-white">
+                    Form System
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  Layout System
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  UI Component Library
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-green-500 mr-2">✅</span>
-                <span className="text-gray-900 dark:text-white">
-                  Form System
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Example Form */}
         <ExampleForm />

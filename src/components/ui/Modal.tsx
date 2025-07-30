@@ -167,7 +167,7 @@ export interface DialogProps extends ModalProps {
   onCancel?: () => void;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'default' | 'destructive';
+  variant?: 'default' | 'error';
 }
 
 export const Dialog: React.FC<DialogProps> = ({
@@ -204,7 +204,7 @@ export const Dialog: React.FC<DialogProps> = ({
             onClick={handleConfirm}
             className={cn(
               'px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2',
-              variant === 'destructive'
+              variant === 'error'
                 ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
                 : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
             )}

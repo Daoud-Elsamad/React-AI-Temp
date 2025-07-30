@@ -17,13 +17,22 @@ export function MainLayout({ children, showSidebar = false }: MainLayoutProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header />
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative">
         {showSidebar && (
-          <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+          <>
+            {/* Mobile sidebar overlay */}
+            {isSidebarOpen && (
+              <div 
+                className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+                onClick={closeSidebar}
+              />
+            )}
+            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+          </>
         )}
 
-        <main className={`flex-1 ${showSidebar ? 'lg:ml-64' : ''}`}>
-          <div className="h-full">{children}</div>
+        <main className={`flex-1 min-w-0 ${showSidebar ? 'lg:ml-64' : ''}`}>
+          <div className="h-full overflow-auto">{children}</div>
         </main>
       </div>
 

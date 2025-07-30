@@ -34,7 +34,10 @@ export interface FormProps<TFieldValues extends FieldValues = FieldValues> {
     | 'secondary'
     | 'outline'
     | 'ghost'
-    | 'destructive';
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'link';
   showSubmitButton?: boolean;
   disabled?: boolean;
   loading?: boolean;

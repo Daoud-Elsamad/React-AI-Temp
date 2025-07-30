@@ -145,7 +145,7 @@ export function useMultiProviderRateLimit(options: UseMultiProviderRateLimitOpti
 
   // Get rate limited providers
   const rateLimitedProviders = Object.entries(providerStates)
-    .filter(([_, info]) => info.isLimited)
+    .filter(([, info]) => info.isLimited)
     .map(([provider, info]) => ({
       provider,
       info,

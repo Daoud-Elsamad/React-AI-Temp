@@ -338,12 +338,12 @@ export class DataManagementService {
           status.storage.quota = await indexedDbStorage.getDatabaseQuota();
           status.storage.available = status.storage.quota - status.storage.size;
           status.storage.type = 'indexeddb';
-        } catch (error) {
+        } catch {
           status.storage.type = 'localstorage';
           // Estimate localStorage usage
           let localStorageSize = 0;
           for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
               localStorageSize += localStorage[key].length;
             }
           }
@@ -386,7 +386,7 @@ export class DataManagementService {
       if (this.config.storage.preferIndexedDB) {
         try {
           await indexedDbStorage.getDatabaseSize();
-        } catch (error) {
+        } catch {
           health.issues.push('IndexedDB storage not accessible');
           health.status = 'warning';
         }

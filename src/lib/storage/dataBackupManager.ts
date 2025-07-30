@@ -382,7 +382,7 @@ export class DataBackupManager {
             issues.push('Settings data invalid');
           }
 
-        } catch (parseError) {
+        } catch {
           issues.push('Backup data is corrupted or invalid JSON');
         }
       }

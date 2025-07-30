@@ -110,7 +110,7 @@ export class DataExportManager {
 
       // Apply encryption if requested
       if (options.encryption && options.password) {
-        exportContent = await this.encryptData(exportContent, options.password);
+        exportContent = await this.encryptData(exportContent);
         filename = filename.replace(/\.[^.]+$/, '.enc');
       }
 
@@ -345,7 +345,7 @@ export class DataExportManager {
     return data;
   }
 
-  private async encryptData(data: Blob, _password: string): Promise<Blob> {
+  private async encryptData(data: Blob): Promise<Blob> {
     // For a real implementation, you would use WebCrypto API
     // For now, return the original data
     console.warn('Encryption not implemented yet');

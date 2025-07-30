@@ -271,7 +271,7 @@ export class PromptEngineeringService {
           message = `Similarity score: ${(score * 100).toFixed(1)}%`;
           break;
 
-        case 'length':
+        case 'length': {
           const actualLength = response.length;
           const expectedLength = parseInt(expectedOutput) || 100;
           const lengthDiff = Math.abs(actualLength - expectedLength) / expectedLength;
@@ -279,6 +279,7 @@ export class PromptEngineeringService {
           passed = score >= (criterion.threshold || 0.8);
           message = `Length: ${actualLength} chars (expected ~${expectedLength})`;
           break;
+        }
 
         case 'custom':
           if (criterion.customFunction) {
