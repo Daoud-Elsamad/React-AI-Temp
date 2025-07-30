@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface PageWrapperProps {
   children: React.ReactNode;
   title?: string;

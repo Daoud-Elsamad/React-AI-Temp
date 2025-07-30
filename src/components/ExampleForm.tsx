@@ -1,7 +1,5 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Input, Button } from '@/components/ui';
+import { Form, FormField, EmailField } from '@/components/forms';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -12,19 +10,14 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function ExampleForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-  });
-
   const onSubmit = async (data: FormData) => {
     console.log('Form submitted:', data);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    alert('Form submitted successfully!');
+    return {
+      success: true,
+      message: 'Form submitted successfully!',
+    };
   };
 
   return (
@@ -32,34 +25,36 @@ export function ExampleForm() {
       <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
         Example Form
       </h3>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input
-          {...register('name')}
+      <Form
+        schema={formSchema}
+        onSubmit={onSubmit}
+        resetOnSuccess
+        submitButtonText="Submit Form"
+        className="space-y-4"
+      >
+        <FormField
+          name="name"
           label="Name"
           placeholder="Enter your name"
-          error={errors.name?.message}
+          required
         />
 
-        <Input
-          {...register('email')}
-          type="email"
+        <EmailField
+          name="email"
           label="Email"
           placeholder="Enter your email"
-          error={errors.email?.message}
+          required
         />
 
-        <Input
-          {...register('age', { valueAsNumber: true })}
+        <FormField
+          name="age"
           type="number"
           label="Age"
           placeholder="Enter your age"
-          error={errors.age?.message}
+          required
+          description="Must be at least 18 years old"
         />
-
-        <Button type="submit" isLoading={isSubmitting} className="w-full">
-          Submit
-        </Button>
-      </form>
+      </Form>
     </div>
   );
 }

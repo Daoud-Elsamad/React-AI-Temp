@@ -5,6 +5,7 @@ import { AboutPage } from './pages/AboutPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ContactPage } from './pages/ContactPage';
 import { UIShowcasePage } from './pages/UIShowcasePage';
+import { FormsShowcasePage } from './pages/FormsShowcasePage';
 import './App.css';
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
         element={
           <MainLayout>
             <UIShowcasePage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/forms-showcase"
+        element={
+          <MainLayout>
+            <FormsShowcasePage />
           </MainLayout>
         }
       />
