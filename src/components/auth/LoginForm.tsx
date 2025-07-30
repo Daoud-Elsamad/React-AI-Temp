@@ -8,9 +8,10 @@ import { useToast } from '@/components/ui/Toast';
 interface LoginFormProps {
   onSuccess?: () => void;
   onSwitchToRegister?: () => void;
+  onForgotPassword?: () => void;
 }
 
-export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
+export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: LoginFormProps) {
   const { login, isLoading, error, clearError } = useLogin();
   const { addToast } = useToast();
   const [formData, setFormData] = useState({
@@ -148,12 +149,13 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           </div>
 
           <div className="text-sm">
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={onForgotPassword}
               className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
             >
               Forgot your password?
-            </a>
+            </button>
           </div>
         </div>
 

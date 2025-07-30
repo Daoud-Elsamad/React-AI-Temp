@@ -150,3 +150,177 @@ export function useTokenRefresh() {
     isRefreshing,
   };
 }
+
+export function useForgotPassword() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<AuthError | null>(null);
+
+  const forgotPassword = async (email: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send reset email');
+      }
+
+      return true;
+    } catch (err: any) {
+      setError({
+        message: err.message || 'Failed to send reset email. Please try again.',
+        field: err.field,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    forgotPassword,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+  };
+}
+
+export function useResetPassword() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<AuthError | null>(null);
+
+  const resetPassword = async (token: string, password: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to reset password');
+      }
+
+      return true;
+    } catch (err: any) {
+      setError({
+        message: err.message || 'Failed to reset password. Please try again.',
+        field: err.field,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    resetPassword,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+  };
+}
+
+export function useChangePassword() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<AuthError | null>(null);
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to change password');
+      }
+
+      return true;
+    } catch (err: any) {
+      setError({
+        message: err.message || 'Failed to change password. Please try again.',
+        field: err.field,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    changePassword,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+  };
+}
+
+export function useUpdateProfile() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<AuthError | null>(null);
+  const { updateUser } = useAuth();
+
+  const updateProfile = async (profileData: any) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      const { user: updatedUser } = await response.json();
+      updateUser(updatedUser);
+
+      return true;
+    } catch (err: any) {
+      setError({
+        message: err.message || 'Failed to update profile. Please try again.',
+        field: err.field,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    updateProfile,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+  };
+}

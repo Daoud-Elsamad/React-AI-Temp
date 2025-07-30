@@ -7,6 +7,7 @@ import { ContactPage } from './pages/ContactPage';
 import { UIShowcasePage } from './pages/UIShowcasePage';
 import { FormsShowcasePage } from './pages/FormsShowcasePage';
 import { AuthPage } from './pages/AuthPage';
+import { AIPage } from './pages/AIPage';
 import './App.css';
 
 function App() {
@@ -50,6 +51,14 @@ function App() {
         element={
           <MainLayout>
             <FormsShowcasePage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/ai"
+        element={
+          <MainLayout>
+            <AIPage />
           </MainLayout>
         }
       />
