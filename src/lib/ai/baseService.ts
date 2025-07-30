@@ -7,7 +7,9 @@ import {
   ImageResponse, 
   ImageGenerateOptions,
   AIServiceConfig,
-  ProviderConfig
+  ProviderConfig,
+  StreamingOptions,
+  StreamResponse
 } from './types';
 import { SimpleCache as AICache } from './simpleCache';
 import { RateLimiter } from './rateLimiter';
@@ -157,6 +159,9 @@ export abstract class BaseAIService implements AIProvider {
    */
   abstract generateText(prompt: string, options?: GenerateOptions): Promise<AIResponse>;
   abstract generateChat(messages: ChatMessage[], options?: GenerateOptions): Promise<AIResponse>;
+  // New streaming methods
+  generateTextStream?(prompt: string, options?: StreamingOptions): Promise<StreamResponse>;
+  generateChatStream?(messages: ChatMessage[], options?: StreamingOptions): Promise<StreamResponse>;
   abstract generateEmbedding?(text: string): Promise<EmbeddingResponse>;
   abstract generateImage?(prompt: string, options?: ImageGenerateOptions): Promise<ImageResponse>;
 

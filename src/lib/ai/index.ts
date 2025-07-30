@@ -1,58 +1,18 @@
-// Main AI Service
-export { AIService, aiService } from './aiService';
+// Re-export all types and services
+export * from './types';
+export * from './aiService';
+export * from './streamingService';
+export * from './baseService';
+export * from './errors';
+export * from './config';
+export * from './cache';
+export * from './rateLimiter';
+export * from './simpleCache';
+export * from './conversationStorage';
 
-// Types and Interfaces
-export type {
-  AIProvider,
-  AIProviderType,
-  ProviderConfig,
-  AIServiceConfig,
-  GenerateOptions,
-  ImageGenerateOptions,
-  ChatMessage,
-  AIResponse,
-  EmbeddingResponse,
-  ImageResponse,
-  RateLimitConfig,
-  CacheConfig,
-  AIError,
-  ProviderCapabilities,
-  ModelInfo,
-  CacheEntry
-} from './types';
+// Provider exports
+export * from './providers/openai';
+export * from './providers/huggingface';
 
-// Individual Providers
-export { OpenAIProvider } from './providers/openai';
-export { HuggingFaceProvider } from './providers/huggingface';
-
-// Base Classes and Utilities
-export { BaseAIService } from './baseService';
-export { AICache } from './cache';
-export { RateLimiter } from './rateLimiter';
-
-// Error Classes
-export {
-  AIServiceError,
-  RateLimitError,
-  AuthenticationError,
-  QuotaExceededError,
-  ContentFilterError,
-  ModelNotFoundError,
-  NetworkError,
-  TimeoutError,
-  ValidationError,
-  mapProviderError,
-  createErrorHandler
-} from './errors';
-
-// Configuration
-export {
-  getAIConfig,
-  mergeAIConfig,
-  validateAIConfig,
-  createRateLimitConfig,
-  createCacheConfig,
-  DEFAULT_AI_CONFIG,
-  DEV_AI_CONFIG,
-  PROD_AI_CONFIG
-} from './config'; 
+// Default service instance
+export { aiService } from './aiService'; 

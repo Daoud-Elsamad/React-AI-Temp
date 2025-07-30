@@ -1,218 +1,211 @@
 import { useState } from 'react';
+import { AIChat, StreamingAIChat, EnhancedAIChat } from '@/components/ai';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/Button';
-import { AIChat, AITextGenerator } from '@/components/ai/AIChat';
 import { useAI } from '@/hooks/useAI';
 import { AIProviderType } from '@/lib/ai';
 
 export function AIPage() {
-  const [activeTab, setActiveTab] = useState<'chat' | 'generate' | 'status'>('chat');
-  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('openai');
-  const { getStatus, getAvailableProviders } = useAI();
+  const [activeTab, setActiveTab] = useState<'enhanced-chat' | 'streaming-chat' | 'chat'>('enhanced-chat');
+  const [provider, setProvider] = useState<AIProviderType>('openai');
+  const { getAvailableProviders } = useAI();
 
-  const status = getStatus();
-  const providers = getAvailableProviders();
+  const availableProviders = getAvailableProviders();
 
   const tabs = [
-    { id: 'chat', label: 'AI Chat', icon: '💬' },
-    { id: 'generate', label: 'Text Generator', icon: '✨' },
-    { id: 'status', label: 'Service Status', icon: '📊' }
-  ];
+    { id: 'enhanced-chat', label: 'Enhanced Chat', description: 'AI chat with conversation management and persistence' },
+    { id: 'streaming-chat', label: 'Streaming Chat', description: 'Real-time AI chat with streaming responses' },
+    { id: 'chat', label: 'Regular Chat', description: 'Traditional AI chat' }
+  ] as const;
 
   return (
-    <PageWrapper
-      title="AI Integration"
-      subtitle="Interact with AI models using OpenAI and Hugging Face APIs"
-    >
-      <div className="space-y-6">
+    <PageWrapper title="AI Assistant" subtitle="Interact with AI models">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Provider Selection */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Available AI Providers
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {providers.map((provider) => (
-              <Button
-                key={provider.id}
-                variant={selectedProvider === provider.id ? 'primary' : 'secondary'}
-                size="sm"
-                onClick={() => setSelectedProvider(provider.id)}
-              >
-                {provider.name}
-                {selectedProvider === provider.id && ' ✓'}
-              </Button>
-            ))}
-          </div>
-          {providers.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              No AI providers are configured. Please check your API keys in the environment variables.
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            AI Provider Settings
+          </h2>
+          <div className="flex items-center space-x-4">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Provider:
+            </label>
+                         <div className="flex space-x-2">
+               {availableProviders.map((p) => (
+                 <Button
+                   key={p.id}
+                   variant={provider === p.id ? 'primary' : 'secondary'}
+                   size="sm"
+                   onClick={() => setProvider(p.id)}
+                 >
+                   {p.name}
+                 </Button>
+               ))}
             </div>
-          )}
+            {availableProviders.length === 0 && (
+              <div className="text-sm text-red-600 dark:text-red-400">
+                No AI providers available. Please check your API keys in .env file.
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        {/* Tab Navigation */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex space-x-8 px-6">
+            <nav className="-mb-px flex space-x-8 px-6">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <span className="mr-2">{tab.icon}</span>
-                  {tab.label}
+                  <div className="flex flex-col items-center">
+                    <span>{tab.label}</span>
+                    <span className="text-xs text-gray-400 mt-1">{tab.description}</span>
+                  </div>
                 </button>
               ))}
             </nav>
           </div>
 
+          {/* Tab Content */}
           <div className="p-6">
+            {activeTab === 'enhanced-chat' && (
+              <div className="space-y-4">
+                <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-purple-900 dark:text-purple-100 mb-2">
+                    🎯 Enhanced AI Chat with Conversation Management
+                  </h3>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Complete chat system with persistent conversations. Features include:
+                  </p>
+                  <ul className="mt-2 text-sm text-purple-600 dark:text-purple-400 list-disc list-inside">
+                    <li>Persistent conversation history</li>
+                    <li>Conversation management and threading</li>
+                    <li>Search and filter conversations</li>
+                    <li>Star and archive conversations</li>
+                    <li>Export/import functionality</li>
+                    <li>Auto-save messages</li>
+                  </ul>
+                </div>
+                <div className="h-[600px]">
+                  <EnhancedAIChat
+                    provider={provider}
+                    systemMessage="You are a helpful AI assistant. Provide detailed and informative responses."
+                    showConversationList={true}
+                    onMessageSent={(message) => console.log('Message sent:', message)}
+                    onResponseReceived={(response) => console.log('Response received:', response)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'streaming-chat' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                    🚀 Streaming AI Chat
+                  </h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    Experience real-time AI responses as they're generated. Features include:
+                  </p>
+                  <ul className="mt-2 text-sm text-blue-600 dark:text-blue-400 list-disc list-inside">
+                    <li>Real-time streaming responses</li>
+                    <li>Connection status indicators</li>
+                    <li>Response cancellation</li>
+                    <li>Auto-reconnection on failures</li>
+                  </ul>
+                </div>
+                <div className="h-96">
+                  <StreamingAIChat
+                    provider={provider}
+                    systemMessage="You are a helpful AI assistant. Provide detailed and informative responses."
+                    placeholder="Ask me anything..."
+                    maxHeight="100%"
+                    enableAutoReconnect={true}
+                    showConnectionStatus={true}
+                    onStreamStart={() => console.log('Stream started')}
+                    onStreamComplete={() => console.log('Stream completed')}
+                  />
+                </div>
+              </div>
+            )}
+
             {activeTab === 'chat' && (
-              <div className="h-96">
-                <AIChat
-                  provider={selectedProvider}
-                  systemMessage="You are a helpful AI assistant. Be concise and helpful in your responses."
-                  placeholder="Ask me anything..."
-                  className="h-full"
-                />
-              </div>
-            )}
-
-            {activeTab === 'generate' && (
-              <div className="space-y-6">
-                <AITextGenerator
-                  provider={selectedProvider}
-                  placeholder="Enter a prompt to generate text..."
-                  buttonText="Generate with AI"
-                />
-                
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                  <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
-                    Example Prompts
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {[
-                      'Write a short story about a robot learning to paint',
-                      'Explain quantum computing in simple terms',
-                      'Create a recipe for chocolate chip cookies',
-                      'Write a haiku about artificial intelligence'
-                    ].map((prompt, index) => (
-                      <div
-                        key={index}
-                        className="p-3 bg-gray-50 dark:bg-gray-700 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                        onClick={() => {
-                          const textarea = document.querySelector('input[placeholder*="prompt"]') as HTMLInputElement;
-                          if (textarea) {
-                            textarea.value = prompt;
-                            textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                          }
-                        }}
-                      >
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          {prompt}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    💬 Regular AI Chat
+                  </h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    Traditional AI chat that waits for complete responses before displaying them.
+                  </p>
+                </div>
+                <div className="h-96">
+                  <AIChat
+                    provider={provider}
+                    systemMessage="You are a helpful AI assistant."
+                    placeholder="Type your message..."
+                    maxHeight="100%"
+                  />
                 </div>
               </div>
             )}
+          </div>
+        </div>
 
-            {activeTab === 'status' && (
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
-                    Service Status
-                  </h4>
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <pre className="text-sm text-gray-700 dark:text-gray-300 overflow-auto">
-                      {JSON.stringify(status, null, 2)}
-                    </pre>
-                  </div>
-                </div>
+        {/* Conversation Management Features */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            🎯 Conversation Management Features
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Persistent Storage</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                All conversations are automatically saved to local storage
+              </p>
+            </div>
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Search & Filter</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Find conversations by content, provider, date, or status
+              </p>
+            </div>
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Organization</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Star important conversations and archive old ones
+              </p>
+            </div>
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Export/Import</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Save conversations as JSON files for backup or sharing
+              </p>
+            </div>
+          </div>
+        </div>
 
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
-                    Provider Information
-                  </h4>
-                  <div className="space-y-3">
-                    {providers.map((provider) => (
-                      <div
-                        key={provider.id}
-                        className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-medium text-gray-900 dark:text-white">
-                            {provider.name}
-                          </h5>
-                          <span className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 text-xs rounded">
-                            Active
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Provider ID: {provider.id}
-                        </div>
-                        <details className="mt-2">
-                          <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400">
-                            View Details
-                          </summary>
-                          <pre className="mt-2 text-xs text-gray-600 dark:text-gray-400 overflow-auto">
-                            {JSON.stringify(provider.status, null, 2)}
-                          </pre>
-                        </details>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h5 className="font-medium text-blue-900 dark:text-blue-400 mb-2">
-                    💡 Setup Instructions
-                  </h5>
-                  <div className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-                    <p>
-                      To use the AI features, you need to configure API keys:
-                    </p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>
-                        <strong>OpenAI:</strong> Get your API key from{' '}
-                        <a 
-                          href="https://platform.openai.com/api-keys" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          OpenAI Platform
-                        </a>
-                      </li>
-                      <li>
-                        <strong>Hugging Face:</strong> Get your API key from{' '}
-                        <a 
-                          href="https://huggingface.co/settings/tokens" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          Hugging Face Settings
-                        </a>
-                      </li>
-                    </ul>
-                    <p className="mt-2">
-                      Add them to your <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">.env</code> file:
-                    </p>
-                    <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded font-mono text-xs">
-                      VITE_OPENAI_API_KEY=your_openai_key_here<br/>
-                      VITE_HUGGINGFACE_API_KEY=your_hf_key_here
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* Technical Details */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            🔧 Technical Implementation
+          </h2>
+          <div className="prose dark:prose-invert max-w-none">
+            <ul className="text-sm space-y-2">
+              <li><strong>Local Storage API:</strong> Browser-native persistent storage for conversation data</li>
+              <li><strong>React Hooks:</strong> Custom hooks for conversation management and state</li>
+              <li><strong>TypeScript Interfaces:</strong> Strongly typed conversation models and threading</li>
+              <li><strong>Conversation Threading:</strong> Organized message history with metadata tracking</li>
+              <li><strong>Search & Filtering:</strong> Client-side full-text search and advanced filtering</li>
+              <li><strong>Export/Import:</strong> JSON-based data portability and backup functionality</li>
+            </ul>
           </div>
         </div>
       </div>

@@ -7,7 +7,9 @@ import {
   ImageGenerateOptions,
   AIResponse,
   EmbeddingResponse,
-  ImageResponse
+  ImageResponse,
+  StreamingOptions,
+  StreamResponse
 } from './types';
 import { OpenAIProvider } from './providers/openai';
 import { HuggingFaceProvider } from './providers/huggingface';
@@ -162,6 +164,70 @@ export class AIService {
     }
     
     return aiProvider.generateImage(prompt, imageOptions);
+  }
+
+  /**
+   * Generate streaming text with the specified provider
+   */
+  async generateTextStream(
+    prompt: string,
+    options: StreamingOptions & { provider?: AIProviderType } = {}
+  ): Promise<StreamResponse> {
+    const { provider: providerType, ...streamingOptions } = options;
+    const provider = this.getProvider(providerType);
+
+    if (!provider.generateTextStream) {
+      throw new AIServiceError(
+        `Provider ${provider.name} does not support text streaming`,
+        'STREAMING_NOT_SUPPORTED',
+        { provider: provider.id }
+      );
+    }
+
+    return provider.generateTextStream(prompt, streamingOptions);
+  }
+
+  /**
+   * Generate streaming chat completion with the specified provider
+   */
+  async generateChatStream(
+    messages: ChatMessage[],
+    options: StreamingOptions & { provider?: AIProviderType } = {}
+  ): Promise<StreamResponse> {
+    const { provider: providerType, ...streamingOptions } = options;
+    const provider = this.getProvider(providerType);
+
+    if (!provider.generateChatStream) {
+      throw new AIServiceError(
+        `Provider ${provider.name} does not support chat streaming`,
+        'STREAMING_NOT_SUPPORTED',
+        { provider: provider.id }
+      );
+    }
+
+    return provider.generateChatStream(messages, streamingOptions);
+  }
+
+  /**
+   * Ask a streaming question (convenience method for single question)
+   */
+  async askStream(
+    question: string,
+    options: StreamingOptions & { 
+      provider?: AIProviderType;
+      systemMessage?: string;
+    } = {}
+  ): Promise<StreamResponse> {
+    const { systemMessage, ...restOptions } = options;
+    const messages: ChatMessage[] = [];
+    
+    if (systemMessage) {
+      messages.push({ role: 'system', content: systemMessage });
+    }
+    
+    messages.push({ role: 'user', content: question });
+    
+    return this.generateChatStream(messages, restOptions);
   }
 
   /**

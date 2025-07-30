@@ -8,6 +8,7 @@ import { UIShowcasePage } from './pages/UIShowcasePage';
 import { FormsShowcasePage } from './pages/FormsShowcasePage';
 import { AuthPage } from './pages/AuthPage';
 import { AIPage } from './pages/AIPage';
+import { FileManagementPage } from './pages/FileManagementPage';
 import './App.css';
 
 function App() {
@@ -67,6 +68,14 @@ function App() {
         element={
           <MainLayout>
             <AuthPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/files"
+        element={
+          <MainLayout>
+            <FileManagementPage />
           </MainLayout>
         }
       />
