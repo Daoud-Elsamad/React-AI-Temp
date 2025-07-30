@@ -122,15 +122,15 @@ export function HomePage() {
                 </span>
               </div>
               <div className="flex items-center">
-                <span className="text-gray-400 mr-2">⏳</span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  Authentication
+                <span className="text-green-500 mr-2">✅</span>
+                <span className="text-gray-900 dark:text-white">
+                  UI Component Library
                 </span>
               </div>
               <div className="flex items-center">
                 <span className="text-gray-400 mr-2">⏳</span>
                 <span className="text-gray-500 dark:text-gray-400">
-                  AI Integration
+                  Authentication
                 </span>
               </div>
             </div>

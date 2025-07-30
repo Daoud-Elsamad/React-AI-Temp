@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Input, Button } from '@/components/ui';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -27,55 +28,37 @@ export function ExampleForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 bg-gray-50 rounded-lg">
-      <h3 className="text-xl font-semibold mb-4">Example Form</h3>
+    <div className="max-w-md mx-auto mt-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+        Example Form
+      </h3>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            {...register('name')}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+        <Input
+          {...register('name')}
+          label="Name"
+          placeholder="Enter your name"
+          error={errors.name?.message}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            {...register('email')}
-            type="email"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
-        </div>
+        <Input
+          {...register('email')}
+          type="email"
+          label="Email"
+          placeholder="Enter your email"
+          error={errors.email?.message}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Age</label>
-          <input
-            {...register('age', { valueAsNumber: true })}
-            type="number"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-          {errors.age && (
-            <p className="mt-1 text-sm text-red-600">{errors.age.message}</p>
-          )}
-        </div>
+        <Input
+          {...register('age', { valueAsNumber: true })}
+          type="number"
+          label="Age"
+          placeholder="Enter your age"
+          error={errors.age?.message}
+        />
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit'}
-        </button>
+        <Button type="submit" isLoading={isSubmitting} className="w-full">
+          Submit
+        </Button>
       </form>
     </div>
   );

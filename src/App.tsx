@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ContactPage } from './pages/ContactPage';
+import { UIShowcasePage } from './pages/UIShowcasePage';
 import './App.css';
 
 function App() {
@@ -31,6 +32,14 @@ function App() {
         element={
           <MainLayout>
             <ContactPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/ui-showcase"
+        element={
+          <MainLayout>
+            <UIShowcasePage />
           </MainLayout>
         }
       />
