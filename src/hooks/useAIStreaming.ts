@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  aiService, 
-  StreamResponse, 
-  StreamChunk, 
+import {
+  aiService,
+  StreamResponse,
+  StreamChunk,
   StreamEvent,
   StreamingOptions,
-  ChatMessage, 
+  ChatMessage,
   AIProviderType,
-  AIServiceError
+  AIServiceError,
 } from '@/lib/ai';
 
 interface UseStreamingState {
@@ -16,7 +16,13 @@ interface UseStreamingState {
   error: string | null;
   content: string;
   chunks: StreamChunk[];
-  connectionStatus: 'idle' | 'connecting' | 'streaming' | 'completed' | 'error' | 'cancelled';
+  connectionStatus:
+    | 'idle'
+    | 'connecting'
+    | 'streaming'
+    | 'completed'
+    | 'error'
+    | 'cancelled';
 }
 
 interface UseStreamingOptions {
@@ -36,7 +42,7 @@ export function useAIStreaming(options: UseStreamingOptions = {}) {
     error: null,
     content: '',
     chunks: [],
-    connectionStatus: 'idle'
+    connectionStatus: 'idle',
   });
 
   const streamResponseRef = useRef<StreamResponse | null>(null);
@@ -50,208 +56,241 @@ export function useAIStreaming(options: UseStreamingOptions = {}) {
       error: null,
       content: '',
       chunks: [],
-      connectionStatus: 'idle'
+      connectionStatus: 'idle',
     });
     reconnectAttemptsRef.current = 0;
   }, []);
 
-  const handleError = useCallback((error: string) => {
-    setState(prev => ({
-      ...prev,
-      loading: false,
-      streaming: false,
-      error,
-      connectionStatus: 'error'
-    }));
-    
-    if (options.onError) {
-      options.onError(error);
-    }
-  }, [options]);
+  const handleError = useCallback(
+    (error: string) => {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        streaming: false,
+        error,
+        connectionStatus: 'error',
+      }));
 
-  const processStreamEvents = useCallback(async (streamResponse: StreamResponse) => {
-    const reader = streamResponse.stream.getReader();
-    
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) {
-          setState(prev => ({
-            ...prev,
-            streaming: false,
-            loading: false,
-            connectionStatus: 'completed'
-          }));
-          
-          if (options.onComplete) {
-            options.onComplete();
-          }
-          break;
-        }
+      if (options.onError) {
+        options.onError(error);
+      }
+    },
+    [options]
+  );
 
-        if (streamResponse.controller.signal.aborted) {
-          setState(prev => ({
-            ...prev,
-            streaming: false,
-            loading: false,
-            connectionStatus: 'cancelled'
-          }));
-          break;
-        }
+  const processStreamEvents = useCallback(
+    async (streamResponse: StreamResponse) => {
+      const reader = streamResponse.stream.getReader();
 
-        // Process the stream event
-        const event: StreamEvent = value;
-        
-        switch (event.type) {
-          case 'start':
-            setState(prev => ({
-              ...prev,
-              streaming: true,
-              loading: false,
-              connectionStatus: 'streaming'
-            }));
-            break;
-            
-          case 'chunk':
-            if (event.data) {
-              setState(prev => ({
-                ...prev,
-                content: prev.content + event.data!.text,
-                chunks: [...prev.chunks, event.data!]
-              }));
-              
-              if (options.onChunk) {
-                options.onChunk(event.data);
-              }
-            }
-            break;
-            
-          case 'complete':
+      try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
             setState(prev => ({
               ...prev,
               streaming: false,
               loading: false,
-              connectionStatus: 'completed'
+              connectionStatus: 'completed',
             }));
-            
+
             if (options.onComplete) {
               options.onComplete();
             }
-            return;
-            
-          case 'error':
-            handleError(event.error || 'Stream error occurred');
-            return;
+            break;
+          }
+
+          if (streamResponse.controller.signal.aborted) {
+            setState(prev => ({
+              ...prev,
+              streaming: false,
+              loading: false,
+              connectionStatus: 'cancelled',
+            }));
+            break;
+          }
+
+          // Process the stream event
+          const event: StreamEvent = value;
+
+          switch (event.type) {
+            case 'start':
+              setState(prev => ({
+                ...prev,
+                streaming: true,
+                loading: false,
+                connectionStatus: 'streaming',
+              }));
+              break;
+
+            case 'chunk':
+              if (event.data) {
+                setState(prev => ({
+                  ...prev,
+                  content: prev.content + event.data!.text,
+                  chunks: [...prev.chunks, event.data!],
+                }));
+
+                if (options.onChunk) {
+                  options.onChunk(event.data);
+                }
+              }
+              break;
+
+            case 'complete':
+              setState(prev => ({
+                ...prev,
+                streaming: false,
+                loading: false,
+                connectionStatus: 'completed',
+              }));
+
+              if (options.onComplete) {
+                options.onComplete();
+              }
+              return;
+
+            case 'error':
+              handleError(event.error || 'Stream error occurred');
+              return;
+          }
+        }
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error ? error.message : 'Stream reading error';
+        handleError(errorMsg);
+      } finally {
+        reader.releaseLock();
+      }
+    },
+    [options, handleError]
+  );
+
+  const startStreaming = useCallback(
+    async (streamingFn: () => Promise<StreamResponse>) => {
+      try {
+        setState(prev => ({
+          ...prev,
+          loading: true,
+          streaming: false,
+          error: null,
+          connectionStatus: 'connecting',
+        }));
+
+        if (options.onStart) {
+          options.onStart();
+        }
+
+        const streamResponse = await streamingFn();
+        streamResponseRef.current = streamResponse;
+
+        await processStreamEvents(streamResponse);
+
+        reconnectAttemptsRef.current = 0; // Reset on successful connection
+      } catch (error) {
+        const errorMsg =
+          error instanceof AIServiceError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'Failed to start streaming';
+
+        // Handle reconnection
+        if (
+          options.autoReconnect &&
+          reconnectAttemptsRef.current < maxReconnectAttempts
+        ) {
+          reconnectAttemptsRef.current++;
+          setTimeout(() => {
+            startStreaming(streamingFn);
+          }, 1000 * reconnectAttemptsRef.current); // Exponential backoff
+        } else {
+          handleError(errorMsg);
         }
       }
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Stream reading error';
-      handleError(errorMsg);
-    } finally {
-      reader.releaseLock();
-    }
-  }, [options, handleError]);
+    },
+    [options, processStreamEvents, handleError, maxReconnectAttempts]
+  );
 
-  const startStreaming = useCallback(async (streamingFn: () => Promise<StreamResponse>) => {
-    try {
-      setState(prev => ({
-        ...prev,
-        loading: true,
-        streaming: false,
-        error: null,
-        connectionStatus: 'connecting'
-      }));
+  const generateTextStream = useCallback(
+    async (
+      prompt: string,
+      streamingOptions?: Omit<
+        StreamingOptions,
+        'onChunk' | 'onComplete' | 'onError' | 'onStart'
+      >
+    ) => {
+      await startStreaming(() =>
+        aiService.generateTextStream(prompt, {
+          ...streamingOptions,
+          provider: options.provider,
+          onChunk: options.onChunk,
+          onComplete: options.onComplete,
+          onError: options.onError,
+          onStart: options.onStart,
+        })
+      );
+    },
+    [startStreaming, options]
+  );
 
-      if (options.onStart) {
-        options.onStart();
+  const generateChatStream = useCallback(
+    async (
+      messages: ChatMessage[],
+      streamingOptions?: Omit<
+        StreamingOptions,
+        'onChunk' | 'onComplete' | 'onError' | 'onStart'
+      >
+    ) => {
+      await startStreaming(() =>
+        aiService.generateChatStream(messages, {
+          ...streamingOptions,
+          provider: options.provider,
+          onChunk: options.onChunk,
+          onComplete: options.onComplete,
+          onError: options.onError,
+          onStart: options.onStart,
+        })
+      );
+    },
+    [startStreaming, options]
+  );
+
+  const askStream = useCallback(
+    async (
+      question: string,
+      streamingOptions?: Omit<
+        StreamingOptions,
+        'onChunk' | 'onComplete' | 'onError' | 'onStart'
+      > & {
+        systemMessage?: string;
       }
-
-      const streamResponse = await streamingFn();
-      streamResponseRef.current = streamResponse;
-      
-      await processStreamEvents(streamResponse);
-      
-      reconnectAttemptsRef.current = 0; // Reset on successful connection
-    } catch (error) {
-      const errorMsg = error instanceof AIServiceError 
-        ? error.message 
-        : error instanceof Error 
-        ? error.message 
-        : 'Failed to start streaming';
-      
-      // Handle reconnection
-      if (options.autoReconnect && reconnectAttemptsRef.current < maxReconnectAttempts) {
-        reconnectAttemptsRef.current++;
-        setTimeout(() => {
-          startStreaming(streamingFn);
-        }, 1000 * reconnectAttemptsRef.current); // Exponential backoff
-      } else {
-        handleError(errorMsg);
-      }
-    }
-  }, [options, processStreamEvents, handleError, maxReconnectAttempts]);
-
-  const generateTextStream = useCallback(async (
-    prompt: string,
-    streamingOptions?: Omit<StreamingOptions, 'onChunk' | 'onComplete' | 'onError' | 'onStart'>
-  ) => {
-    await startStreaming(() => 
-      aiService.generateTextStream(prompt, {
-        ...streamingOptions,
-        provider: options.provider,
-        onChunk: options.onChunk,
-        onComplete: options.onComplete,
-        onError: options.onError,
-        onStart: options.onStart
-      })
-    );
-  }, [startStreaming, options]);
-
-  const generateChatStream = useCallback(async (
-    messages: ChatMessage[],
-    streamingOptions?: Omit<StreamingOptions, 'onChunk' | 'onComplete' | 'onError' | 'onStart'>
-  ) => {
-    await startStreaming(() => 
-      aiService.generateChatStream(messages, {
-        ...streamingOptions,
-        provider: options.provider,
-        onChunk: options.onChunk,
-        onComplete: options.onComplete,
-        onError: options.onError,
-        onStart: options.onStart
-      })
-    );
-  }, [startStreaming, options]);
-
-  const askStream = useCallback(async (
-    question: string,
-    streamingOptions?: Omit<StreamingOptions, 'onChunk' | 'onComplete' | 'onError' | 'onStart'> & {
-      systemMessage?: string;
-    }
-  ) => {
-    await startStreaming(() => 
-      aiService.askStream(question, {
-        ...streamingOptions,
-        provider: options.provider,
-        onChunk: options.onChunk,
-        onComplete: options.onComplete,
-        onError: options.onError,
-        onStart: options.onStart
-      })
-    );
-  }, [startStreaming, options]);
+    ) => {
+      await startStreaming(() =>
+        aiService.askStream(question, {
+          ...streamingOptions,
+          provider: options.provider,
+          onChunk: options.onChunk,
+          onComplete: options.onComplete,
+          onError: options.onError,
+          onStart: options.onStart,
+        })
+      );
+    },
+    [startStreaming, options]
+  );
 
   const cancelStream = useCallback(() => {
     if (streamResponseRef.current) {
       streamResponseRef.current.controller.abort();
       streamResponseRef.current = null;
-      
+
       setState(prev => ({
         ...prev,
         loading: false,
         streaming: false,
-        connectionStatus: 'cancelled'
+        connectionStatus: 'cancelled',
       }));
     }
   }, []);
@@ -278,22 +317,25 @@ export function useAIStreaming(options: UseStreamingOptions = {}) {
     askStream,
     cancelStream,
     resetState,
-    
+
     // Connection info
     isConnected: state.connectionStatus === 'streaming',
-    canRetry: state.connectionStatus === 'error' && reconnectAttemptsRef.current < maxReconnectAttempts,
-    retryAttempts: reconnectAttemptsRef.current
+    canRetry:
+      state.connectionStatus === 'error' &&
+      reconnectAttemptsRef.current < maxReconnectAttempts,
+    retryAttempts: reconnectAttemptsRef.current,
   };
 }
 
 // Hook for managing streaming conversation
 export function useStreamingConversation(options: UseStreamingOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState<string>('');
-  
+  const [currentStreamingMessage, setCurrentStreamingMessage] =
+    useState<string>('');
+
   const streamingHook = useAIStreaming({
     ...options,
-    onChunk: (chunk) => {
+    onChunk: chunk => {
       setCurrentStreamingMessage(prev => prev + chunk.text);
       if (options.onChunk) {
         options.onChunk(chunk);
@@ -302,39 +344,51 @@ export function useStreamingConversation(options: UseStreamingOptions = {}) {
     onComplete: () => {
       // Add the completed message to conversation
       if (currentStreamingMessage.trim()) {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: currentStreamingMessage
-        }]);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: currentStreamingMessage,
+          },
+        ]);
         setCurrentStreamingMessage('');
       }
       if (options.onComplete) {
         options.onComplete();
       }
     },
-    onError: (error) => {
+    onError: error => {
       setCurrentStreamingMessage('');
       if (options.onError) {
         options.onError(error);
       }
-    }
+    },
   });
 
   const addMessage = useCallback((message: ChatMessage) => {
     setMessages(prev => [...prev, message]);
   }, []);
 
-  const sendMessage = useCallback(async (
-    content: string,
-    role: 'user' | 'system' = 'user',
-    streamingOptions?: Omit<StreamingOptions, 'onChunk' | 'onComplete' | 'onError' | 'onStart'>
-  ) => {
-    const userMessage: ChatMessage = { role, content };
-    addMessage(userMessage);
-    setCurrentStreamingMessage('');
+  const sendMessage = useCallback(
+    async (
+      content: string,
+      role: 'user' | 'system' = 'user',
+      streamingOptions?: Omit<
+        StreamingOptions,
+        'onChunk' | 'onComplete' | 'onError' | 'onStart'
+      >
+    ) => {
+      const userMessage: ChatMessage = { role, content };
+      addMessage(userMessage);
+      setCurrentStreamingMessage('');
 
-    await streamingHook.generateChatStream([...messages, userMessage], streamingOptions);
-  }, [messages, addMessage, streamingHook]);
+      await streamingHook.generateChatStream(
+        [...messages, userMessage],
+        streamingOptions
+      );
+    },
+    [messages, addMessage, streamingHook]
+  );
 
   const clearConversation = useCallback(() => {
     setMessages([]);
@@ -358,10 +412,13 @@ export function useStreamingConversation(options: UseStreamingOptions = {}) {
     sendMessage,
     clearConversation,
     cancelCurrentMessage,
-    
+
     // Computed
-    allMessages: currentStreamingMessage 
-      ? [...messages, { role: 'assistant' as const, content: currentStreamingMessage }]
-      : messages
+    allMessages: currentStreamingMessage
+      ? [
+          ...messages,
+          { role: 'assistant' as const, content: currentStreamingMessage },
+        ]
+      : messages,
   };
-} 
+}

@@ -11,6 +11,7 @@ export function Header() {
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
     { name: 'AI Integration', href: '/ai' },
+    { name: 'AI File Processing', href: '/ai-files' },
     { name: 'File Management', href: '/files' },
     { name: 'UI Components', href: '/ui-showcase' },
     { name: 'Forms', href: '/forms-showcase' },

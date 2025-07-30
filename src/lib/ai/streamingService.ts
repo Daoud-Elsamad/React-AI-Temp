@@ -1,4 +1,9 @@
-import { StreamEvent, StreamChunk, StreamResponse, StreamingOptions } from './types';
+import {
+  StreamEvent,
+  StreamChunk,
+  StreamResponse,
+  StreamingOptions,
+} from './types';
 import { AIServiceError } from './errors';
 
 export class StreamingService {
@@ -17,16 +22,16 @@ export class StreamingService {
     try {
       // Create EventSource for SSE connection
       const eventSource = new EventSource(url);
-      
+
       const streamResponse: StreamResponse = {
         id: streamId,
         stream: this.createReadableStream(eventSource, options, controller),
         controller,
-        status: 'connecting'
+        status: 'connecting',
       };
 
       this.activeStreams.set(streamId, streamResponse);
-      
+
       // Handle connection events
       eventSource.onopen = () => {
         streamResponse.status = 'streaming';
@@ -35,7 +40,7 @@ export class StreamingService {
         }
       };
 
-      eventSource.onerror = (_error) => {
+      eventSource.onerror = () => {
         streamResponse.status = 'error';
         const errorMsg = 'SSE connection error';
         if (options.onError) {
@@ -71,28 +76,35 @@ export class StreamingService {
         signal: controller.signal,
         headers: {
           ...requestInit.headers,
-          'Accept': 'text/event-stream',
-          'Cache-Control': 'no-cache'
-        }
+          Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache',
+        },
       });
 
       if (!response.ok) {
-               throw new AIServiceError(
-         `HTTP ${response.status}: ${response.statusText}`,
-         'HTTP_ERROR',
-         { status: response.status }
-       );
+        throw new AIServiceError(
+          `HTTP ${response.status}: ${response.statusText}`,
+          'HTTP_ERROR',
+          { status: response.status }
+        );
       }
 
       if (!response.body) {
-        throw new AIServiceError('No response body received', 'NO_RESPONSE_BODY');
+        throw new AIServiceError(
+          'No response body received',
+          'NO_RESPONSE_BODY'
+        );
       }
 
       const streamResponse: StreamResponse = {
         id: streamId,
-        stream: this.createReadableStreamFromResponse(response, options, controller),
+        stream: this.createReadableStreamFromResponse(
+          response,
+          options,
+          controller
+        ),
         controller,
-        status: 'streaming'
+        status: 'streaming',
       };
 
       this.activeStreams.set(streamId, streamResponse);
@@ -132,7 +144,7 @@ export class StreamingService {
    * Cancel all active streams
    */
   cancelAllStreams(): void {
-    for (const [_streamId, stream] of this.activeStreams) {
+    for (const [, stream] of this.activeStreams) {
       stream.controller.abort();
       stream.status = 'cancelled';
     }
@@ -164,24 +176,24 @@ export class StreamingService {
     return new ReadableStream<StreamEvent>({
       start(streamController) {
         // Handle different SSE event types
-        eventSource.addEventListener('chunk', (event) => {
+        eventSource.addEventListener('chunk', event => {
           try {
             const data = JSON.parse(event.data) as StreamChunk;
             const streamEvent: StreamEvent = {
               type: 'chunk',
               data,
-              id: event.lastEventId || undefined
+              id: event.lastEventId || undefined,
             };
-            
+
             streamController.enqueue(streamEvent);
-            
+
             if (options.onChunk) {
               options.onChunk(data);
             }
-          } catch (error) {
+          } catch {
             const errorEvent: StreamEvent = {
               type: 'error',
-              error: 'Failed to parse chunk data'
+              error: 'Failed to parse chunk data',
             };
             streamController.enqueue(errorEvent);
           }
@@ -192,21 +204,21 @@ export class StreamingService {
           streamController.enqueue(completeEvent);
           streamController.close();
           eventSource.close();
-          
+
           if (options.onComplete) {
             options.onComplete();
           }
         });
 
-        eventSource.addEventListener('error', (_event) => {
+        eventSource.addEventListener('error', () => {
           const errorEvent: StreamEvent = {
             type: 'error',
-            error: 'SSE connection error'
+            error: 'SSE connection error',
           };
           streamController.enqueue(errorEvent);
           streamController.error(new Error('SSE connection error'));
           eventSource.close();
-          
+
           if (options.onError) {
             options.onError('SSE connection error');
           }
@@ -217,7 +229,7 @@ export class StreamingService {
           streamController.close();
           eventSource.close();
         });
-      }
+      },
     });
   }
 
@@ -236,13 +248,14 @@ export class StreamingService {
     return new ReadableStream<StreamEvent>({
       async start(streamController) {
         try {
+          // eslint-disable-next-line no-constant-condition
           while (true) {
             const { done, value } = await reader.read();
-            
+
             if (done) {
               const completeEvent: StreamEvent = { type: 'complete' };
               streamController.enqueue(completeEvent);
-              
+
               if (options.onComplete) {
                 options.onComplete();
               }
@@ -266,19 +279,19 @@ export class StreamingService {
                     const data = JSON.parse(line.slice(6)) as StreamChunk;
                     const streamEvent: StreamEvent = {
                       type: 'chunk',
-                      data
+                      data,
                     };
-                    
+
                     streamController.enqueue(streamEvent);
-                    
+
                     if (options.onChunk) {
                       options.onChunk(data);
                     }
                   }
-                } catch (error) {
+                } catch {
                   const errorEvent: StreamEvent = {
                     type: 'error',
-                    error: 'Failed to parse streaming data'
+                    error: 'Failed to parse streaming data',
                   };
                   streamController.enqueue(errorEvent);
                 }
@@ -288,13 +301,16 @@ export class StreamingService {
         } catch (error) {
           const errorEvent: StreamEvent = {
             type: 'error',
-            error: error instanceof Error ? error.message : 'Stream reading error'
+            error:
+              error instanceof Error ? error.message : 'Stream reading error',
           };
           streamController.enqueue(errorEvent);
           streamController.error(error);
-          
+
           if (options.onError) {
-            options.onError(error instanceof Error ? error.message : 'Stream reading error');
+            options.onError(
+              error instanceof Error ? error.message : 'Stream reading error'
+            );
           }
         } finally {
           reader.releaseLock();
@@ -305,7 +321,7 @@ export class StreamingService {
       cancel() {
         reader.cancel();
         controller.abort();
-      }
+      },
     });
   }
 
@@ -324,7 +340,7 @@ export class StreamingService {
     if (stream) {
       try {
         stream.controller.abort();
-      } catch (error) {
+      } catch {
         // Ignore abort errors during cleanup
       }
       this.activeStreams.delete(streamId);
@@ -385,4 +401,4 @@ export class StreamingService {
 }
 
 // Singleton instance
-export const streamingService = new StreamingService(); 
+export const streamingService = new StreamingService();

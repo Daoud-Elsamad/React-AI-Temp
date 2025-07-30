@@ -9,6 +9,7 @@ import { FormsShowcasePage } from './pages/FormsShowcasePage';
 import { AuthPage } from './pages/AuthPage';
 import { AIPage } from './pages/AIPage';
 import { FileManagementPage } from './pages/FileManagementPage';
+import { AIFileProcessingPage } from './pages/AIFileProcessingPage';
 import './App.css';
 
 function App() {
@@ -76,6 +77,14 @@ function App() {
         element={
           <MainLayout>
             <FileManagementPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/ai-files"
+        element={
+          <MainLayout>
+            <AIFileProcessingPage />
           </MainLayout>
         }
       />

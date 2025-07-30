@@ -1,23 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { DragDropUpload } from './DragDropUpload';
 import { FilePreview } from './FilePreview';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { FileUploadOptions } from '@/lib/types/file';
+import { FileUploadOptions, UploadedFile } from '@/lib/types/file';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 
 interface FileManagerProps {
   options?: FileUploadOptions;
-  onFilesChange?: (files: any[]) => void;
+  onFilesChange?: (files: UploadedFile[]) => void;
   showUploadAll?: boolean;
   className?: string;
 }
 
-export function FileManager({ 
-  options, 
-  onFilesChange, 
-  showUploadAll = true, 
-  className = '' 
+export function FileManager({
+  options,
+  onFilesChange,
+  showUploadAll = true,
+  className = '',
 }: FileManagerProps) {
   const {
     files,
@@ -39,7 +39,7 @@ export function FileManager({
 
   const handleUploadAll = async () => {
     const pendingFiles = files.filter(file => file.uploadStatus === 'pending');
-    
+
     for (const file of pendingFiles) {
       try {
         await simulateUpload(file.id);
@@ -57,13 +57,25 @@ export function FileManager({
     }
   };
 
-  useEffect(() => {
-    onFilesChange?.(files);
-  }, [files, onFilesChange]);
+  const memoizedOnFilesChange = useCallback(onFilesChange || (() => {}), [
+    onFilesChange,
+  ]);
 
-  const pendingCount = files.filter(file => file.uploadStatus === 'pending').length;
-  const uploadingCount = files.filter(file => file.uploadStatus === 'uploading').length;
-  const completedCount = files.filter(file => file.uploadStatus === 'completed').length;
+  useEffect(() => {
+    if (onFilesChange) {
+      memoizedOnFilesChange(files);
+    }
+  }, [files, memoizedOnFilesChange, onFilesChange]);
+
+  const pendingCount = files.filter(
+    file => file.uploadStatus === 'pending'
+  ).length;
+  const uploadingCount = files.filter(
+    file => file.uploadStatus === 'uploading'
+  ).length;
+  const completedCount = files.filter(
+    file => file.uploadStatus === 'completed'
+  ).length;
   const errorCount = files.filter(file => file.uploadStatus === 'error').length;
 
   return (
@@ -141,14 +153,14 @@ export function FileManager({
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-3">
-          {files.map((file) => (
+          {files.map(file => (
             <div key={file.id} className="relative">
               <FilePreview
                 file={file}
                 onRemove={removeFile}
                 showProgress={true}
               />
-              
+
               {/* Individual upload button for pending files */}
               {file.uploadStatus === 'pending' && (
                 <div className="absolute top-4 right-16">
@@ -170,10 +182,14 @@ export function FileManager({
       {/* Empty state */}
       {files.length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <Icon name="cloudUpload" size="xl" className="mx-auto mb-2 text-gray-300" />
+          <Icon
+            name="cloudUpload"
+            size="xl"
+            className="mx-auto mb-2 text-gray-300"
+          />
           <p>No files uploaded yet</p>
         </div>
       )}
     </div>
   );
-} 
+}
